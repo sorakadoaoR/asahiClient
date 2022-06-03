@@ -5,6 +5,9 @@ import org.zz.gmhelper.SM2Util;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 public class RemoteSocket implements Runnable{
@@ -15,6 +18,7 @@ public class RemoteSocket implements Runnable{
     int lastSeen;
     byte[] sm4key;
     MemoryStream memoryStream = new MemoryStream(1024);
+    private LinkedList<HandlerData> queuingData = new LinkedList<>();
     @Override
     public void run() {
         try {
@@ -89,6 +93,8 @@ public class RemoteSocket implements Runnable{
         }
     }
 
-
+    public void addToQueue(HandlerData data){
+        queuingData.add(data);
+    }
 
 }

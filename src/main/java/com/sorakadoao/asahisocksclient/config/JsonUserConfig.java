@@ -2,6 +2,7 @@ package com.sorakadoao.asahisocksclient.config;
 
 public class JsonUserConfig
 {
+    public int local_port;
     public String host;
     public int port;
     public String name;
