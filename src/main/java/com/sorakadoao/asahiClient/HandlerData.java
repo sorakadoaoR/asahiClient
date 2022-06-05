@@ -1,6 +1,4 @@
-package com.sorakadoao.asahisocksclient;
-
-import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+package com.sorakadoao.asahiClient;
 
 public class HandlerData {
     public byte[] data;

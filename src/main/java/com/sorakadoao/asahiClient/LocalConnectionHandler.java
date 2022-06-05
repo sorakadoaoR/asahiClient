@@ -1,6 +1,6 @@
-package com.sorakadoao.asahisocksclient;
+package com.sorakadoao.asahiClient;
 
-import com.sorakadoao.asahisocksclient.packet.ConnectRequest;
+import com.sorakadoao.asahiClient.request.ConnectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +12,7 @@ public class LocalConnectionHandler implements Runnable{
     InputStream input;
     OutputStream output;
     public long lastSeen;
-    public int id;
+    public int id;//same as requestId in server side
     public LocalConnectionHandler(Socket client,int id){
         this.client = client;
         this.id = id;
@@ -68,26 +68,26 @@ public class LocalConnectionHandler implements Runnable{
             }
             byte[] port = new byte[2];
             input.read(port);
-            ConnectRequest connectRequest = new ConnectRequest((byte) addressType,address,port);
+            ConnectRequest connectRequest = new ConnectRequest(this,(byte) addressType,address,port);
+            Main.remoteSocket.requestHashSet.add(connectRequest);
 
+            int nowByte = 0;
+            while(true){
+                nowByte= input.read();
 
-            //int nowByte = 0;
-            //while(true){
-            //    nowByte= input.read();
-//
-            //    if(nowByte==-1) {
-            //        System.out.println("Input stream ended.");
-            //        closeConnection();
-            //        return;
-            //    }else{
-            //        System.out.println(nowByte);
-            //    }
-            //    byte[] data = input.readAllBytes();
-            //    byte[] data2 = new byte[data.length+1];
-            //    data2[0] = (byte) nowByte;
-            //    System.arraycopy(data,0,data2,1,data.length);
-            //    Main.remoteSocket.addToQueue(new HandlerData(data2,id));
-            //}
+                if(nowByte==-1) {
+                    System.out.println("Input stream ended.");
+                    closeConnection();
+                    return;
+                }else{
+                    System.out.println(nowByte);
+                }
+                byte[] data = input.readAllBytes();
+                byte[] data2 = new byte[data.length+1];
+                data2[0] = (byte) nowByte;
+                System.arraycopy(data,0,data2,1,data.length);
+                //Main.remoteSocket.addToQueue(new HandlerData(data2,id));
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,6 +96,16 @@ public class LocalConnectionHandler implements Runnable{
         }
     }
 
+
+    //send data to user
+    public void sendData(byte[] data){
+        try {
+            output.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+            closeConnection();
+        }
+    }
 
     public void closeConnection(){
         try {

@@ -1,12 +1,11 @@
-package com.sorakadoao.asahisocksclient.config;
+package com.sorakadoao.asahiClient.config;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.sorakadoao.asahisocksclient.Main;
+import com.sorakadoao.asahiClient.Main;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.zz.gmhelper.BCECUtil;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 public class Config {

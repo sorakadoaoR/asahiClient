@@ -1,4 +1,4 @@
-package com.sorakadoao.asahisocksclient.config;
+package com.sorakadoao.asahiClient.config;
 
 public class JsonUserConfig
 {

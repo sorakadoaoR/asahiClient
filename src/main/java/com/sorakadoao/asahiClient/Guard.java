@@ -1,8 +1,9 @@
-package com.sorakadoao.asahisocksclient;
+package com.sorakadoao.asahiClient;
 
+
+import com.sorakadoao.asahiClient.request.Request;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 //speed tester, terminate dead connections
@@ -19,11 +20,14 @@ public class Guard implements Runnable{
     public void run() {
         try {
             while (true){
-                Thread.sleep(100);
-                Iterator<Map.Entry<Integer,LocalConnectionHandler>> it1 = Main.localServer.connectionMap.entrySet().iterator();
-                while (it1.hasNext()){
-                    if(it1.next().getValue().client.isClosed()) it1.remove();
+                Thread.sleep(2);
+                for(Request request:Main.remoteSocket.requestHashSet){
+                    Main.remoteSocket.sendData(request.buildEncryptedPacket());
                 }
+                //Iterator<Map.Entry<Integer,LocalConnectionHandler>> it1 = Main.localServer.connectionMap.entrySet().iterator();
+                //while (it1.hasNext()){
+                //    if(it1.next().getValue().client.isClosed()) it1.remove();
+                //}
 
             }
         } catch (InterruptedException e) {

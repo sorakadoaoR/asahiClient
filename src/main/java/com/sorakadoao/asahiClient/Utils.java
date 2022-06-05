@@ -1,4 +1,4 @@
-package com.sorakadoao.asahisocksclient;
+package com.sorakadoao.asahiClient;
 
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
 public class Utils {
@@ -24,8 +25,12 @@ public class Utils {
         }
     }
 
-    public static void readByteFromInput(InputStream inputStream, byte[] bytes, int length) throws TimeoutException {
-        try{
+    public static void write2ByteInt(OutputStream outputStream, int i)throws IOException{
+            outputStream.write((i&0xff00)>>8);
+            outputStream.write(i&0xff);
+    }
+
+    public static void readByteFromInput(InputStream inputStream, byte[] bytes, int length) throws IOException{
             int byteCount = 0;
             while(true){
                 int nowByte = 0;
@@ -35,12 +40,9 @@ public class Utils {
                 byteCount++;
                 if(byteCount>length-1) break;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
-    public static int readInt(InputStream inputStream) throws TimeoutException{
+    public static int readInt(InputStream inputStream) throws IOException{
         int ans = 0;
         byte[] bs = new byte[4];
         readByteFromInput(inputStream,bs,4);
@@ -49,5 +51,15 @@ public class Utils {
             ans+=b;
         }
         return ans;
+    }
+
+    public static byte[] generateRandomBytes(int count, Random random){
+        byte[] ans = new byte[count];
+        random.nextBytes(ans);
+        return ans;
+    }
+
+    public static int read2byteInt(InputStream inputStream) throws TimeoutException,IOException{
+        return (inputStream.read()<<8) + inputStream.read();
     }
 }

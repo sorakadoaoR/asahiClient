@@ -1,4 +1,4 @@
-package com.sorakadoao.asahisocksclient;
+package com.sorakadoao.asahiClient;
 
 import java.io.IOException;
 import java.net.ServerSocket;

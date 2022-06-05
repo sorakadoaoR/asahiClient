@@ -1,11 +1,8 @@
-package com.sorakadoao.asahisocksclient;
+package com.sorakadoao.asahiClient;
 
 import java.io.ByteArrayOutputStream;
 
 public class MemoryStream extends ByteArrayOutputStream {
-    public byte[] getNativeByte(){
-        return buf;
-    }
     public void writeInt(int i){
         write(i>>24);
         write((i<<8)>>24);
