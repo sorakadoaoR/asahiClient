@@ -1,5 +1,6 @@
 package com.sorakadoao.asahiClient;
 
+import com.sorakadoao.asahiClient.request.PendingRequest;
 import com.sorakadoao.asahiClient.request.Request;
 import com.sorakadoao.asahiClient.response.Response;
 import com.sorakadoao.asahiClient.response.ResponseInfo;
@@ -24,12 +25,10 @@ public class RemoteSocket implements Runnable{
     Random random;
     MemoryStream memoryStream = new MemoryStream(1024);
     public HashMap<Integer,LocalConnectionHandler> requestConnectionHandlerMap = new HashMap<>();
-    public HashSet<Request> requestHashSet = new HashSet<>();
+    public HashSet<PendingRequest> requestHashSet = new HashSet<>();
     public RemoteSocket(){
         random = new Random();
-        Guard guard = new Guard();
-        Thread thread = new Thread(guard);
-        thread.start();
+
     }
     @Override
     public void run() {
@@ -44,6 +43,7 @@ public class RemoteSocket implements Runnable{
             }
             System.out.println("Logged in.");
             while(true){
+                //循环监听并处理服务器发来的响应
                 System.out.println(114514);
                 byte[] encryptedHeader= input.readNBytes(16);
                 byte[] decryptedHeader = SM4Util.decrypt_ECB_Padding(sm4key,encryptedHeader);
@@ -51,7 +51,9 @@ public class RemoteSocket implements Runnable{
                 byte[] encryptedData = input.readNBytes(responseInfo.encryptedDataLength);
                 byte[] decryptedData = SM4Util.decrypt_ECB_Padding(sm4key,encryptedData);
                 Response response = Response.analyzer(responseInfo,decryptedData);
-                response.resolve();
+                Request correspondingRequest = Request.getRequestByResponseInfo(responseInfo);
+                correspondingRequest.resolve(response);
+
                 input.skipNBytes(responseInfo.rubbishLength);
             }
 
@@ -118,10 +120,14 @@ public class RemoteSocket implements Runnable{
         }
     }
 
-    //send data to server
-    public void sendData(byte[] data){
+    /**
+     * send any data to server, should be called by guard
+     */
+
+    public void sendData(byte[] request){
+
         try {
-            output.write(data);
+            output.write(request);
         } catch (IOException e) {
             e.printStackTrace();
             closeConnection();

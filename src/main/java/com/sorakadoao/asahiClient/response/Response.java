@@ -3,16 +3,17 @@ package com.sorakadoao.asahiClient.response;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 
+//服务器发来的响应
 public abstract class Response {
     public ResponseInfo responseInfo;
     private static HashMap<Integer,IncompleteResponse> incompleteResponseMap = new HashMap<>();
+
 
     Response(ResponseInfo requestInfo){
         this.responseInfo = requestInfo;
     }
 
-    //method to resolve the request
-    public abstract void resolve();
+
 
     public static Response analyzer(ResponseInfo requestInfo,byte[] decryptedData){
         //merge coming request with existing incomplete request
@@ -35,7 +36,7 @@ public abstract class Response {
 
         Response request = switch (requestInfo.requestType) {
             case 1 -> new ConnectResponse(requestInfo, new ByteArrayInputStream(decryptedData));
-            //case 2 -> new TcpResponse(requestInfo, decryptedData);
+            case 2 -> new TcpResponse(requestInfo, decryptedData);
             default -> null;
         };
         return request;

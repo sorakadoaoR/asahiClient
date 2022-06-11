@@ -1,6 +1,7 @@
 package com.sorakadoao.asahiClient;
 
 import com.sorakadoao.asahiClient.request.ConnectRequest;
+import com.sorakadoao.asahiClient.request.TcpRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,24 +70,22 @@ public class LocalConnectionHandler implements Runnable{
             byte[] port = new byte[2];
             input.read(port);
             ConnectRequest connectRequest = new ConnectRequest(this,(byte) addressType,address,port);
-            Main.remoteSocket.requestHashSet.add(connectRequest);
+            connectRequest.send();
 
-            int nowByte = 0;
+            byte[] bytes;
             while(true){
-                nowByte= input.read();
+                bytes= input.readAllBytes();
 
-                if(nowByte==-1) {
+                if(bytes.length==1) {
                     System.out.println("Input stream ended.");
                     closeConnection();
                     return;
                 }else{
-                    System.out.println(nowByte);
+                    System.out.println("Incoming message");
                 }
                 byte[] data = input.readAllBytes();
-                byte[] data2 = new byte[data.length+1];
-                data2[0] = (byte) nowByte;
-                System.arraycopy(data,0,data2,1,data.length);
-                //Main.remoteSocket.addToQueue(new HandlerData(data2,id));
+                TcpRequest tcpRequest = new TcpRequest(data,this);
+                tcpRequest.send();
             }
 
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.sorakadoao.asahiClient;
 
 
+import com.sorakadoao.asahiClient.request.PendingRequest;
 import com.sorakadoao.asahiClient.request.Request;
 
 import java.util.Iterator;
@@ -21,8 +22,15 @@ public class Guard implements Runnable{
         try {
             while (true){
                 Thread.sleep(2);
-                for(Request request:Main.remoteSocket.requestHashSet){
-                    Main.remoteSocket.sendData(request.buildEncryptedPacket());
+                //TODO
+                Iterator<PendingRequest> it = Main.remoteSocket.requestHashSet.iterator();
+                while(it.hasNext()){
+                    PendingRequest pendingRequest= it.next();
+                    //发送完了就开始等待服务器回复
+                    if(pendingRequest.send()) {
+                        it.remove();
+                        Request.addToRequestMap(pendingRequest.request);
+                    }
                 }
                 //Iterator<Map.Entry<Integer,LocalConnectionHandler>> it1 = Main.localServer.connectionMap.entrySet().iterator();
                 //while (it1.hasNext()){
@@ -42,5 +50,9 @@ public class Guard implements Runnable{
         timeSinceLastSpeedTest=0;
         speedLastSecond = (int)(totalData-lastTotalData);
 
+    }
+
+    public int getNextRequestLength(Request request){
+        return 4096;
     }
 }

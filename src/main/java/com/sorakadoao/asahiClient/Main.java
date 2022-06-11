@@ -16,7 +16,7 @@ public class Main {
     public static BCECPrivateKey clientPrivateKey;
     public static RemoteSocket remoteSocket;
     public static LocalServer localServer;
-
+    public static Guard guard;
 
     public static void main(String[] args) {
         //try {
@@ -25,6 +25,9 @@ public class Main {
         //    byte[] b = SM4Util.encrypt_ECB_Padding(k,a);
         //    System.out.println(ByteUtils.toHexString(b)+" "+b.length);
         //} catch (Exception e){}
+        guard = new Guard();
+        Thread thread = new Thread(guard);
+        thread.start();
 
         Config.loadUserConfig();
         remoteSocket = new RemoteSocket();

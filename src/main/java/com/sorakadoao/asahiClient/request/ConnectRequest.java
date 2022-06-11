@@ -1,9 +1,15 @@
 package com.sorakadoao.asahiClient.request;
 
 import com.sorakadoao.asahiClient.LocalConnectionHandler;
+import com.sorakadoao.asahiClient.Main;
 import com.sorakadoao.asahiClient.MemoryStream;
+import com.sorakadoao.asahiClient.Utils;
+import com.sorakadoao.asahiClient.response.ConnectResponse;
+import com.sorakadoao.asahiClient.response.Response;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 
 public class ConnectRequest extends Request {
     public byte[] address;
@@ -13,7 +19,7 @@ public class ConnectRequest extends Request {
         return 1;
     }
     public ConnectRequest(LocalConnectionHandler localConnectionHandler, byte addressType, byte[] address, byte[] port){
-        super(true,localConnectionHandler);
+        super(localConnectionHandler);
         this.address = address;
         this.addressType = addressType;
         this.port = port;
@@ -39,5 +45,23 @@ public class ConnectRequest extends Request {
             e.printStackTrace();
         }
         return ans;
+    }
+
+    @Override
+    public void resolve(Response response) {
+        System.out.println(((ConnectResponse)response).status);
+        InetAddress a = InetAddress.getLoopbackAddress();
+        MemoryStream memoryStream = new MemoryStream(64);
+        memoryStream.write(5);
+        memoryStream.write(((ConnectResponse)response).status);
+        memoryStream.write(0);
+        memoryStream.write((a instanceof Inet4Address)?1:4);
+        try {
+            memoryStream.write(a.getAddress());
+            Utils.write2ByteInt(memoryStream, Main.juc.port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        localConnectionHandler.sendData(memoryStream.toByteArray());
     }
 }
