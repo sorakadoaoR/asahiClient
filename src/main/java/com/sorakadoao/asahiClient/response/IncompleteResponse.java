@@ -20,7 +20,7 @@ public class IncompleteResponse extends Response{
         int nowIndex = 0;
         for(byte[] bytes:incompleteDecryptedData){
             System.arraycopy(bytes,0,ans,nowIndex,bytes.length);
-            nowIndex++;
+            nowIndex+= bytes.length;
         }
         return ans;
     }

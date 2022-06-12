@@ -2,6 +2,7 @@ package com.sorakadoao.asahiClient;
 
 import com.sorakadoao.asahiClient.request.ConnectRequest;
 import com.sorakadoao.asahiClient.request.TcpRequest;
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,11 +14,13 @@ public class LocalConnectionHandler implements Runnable{
     InputStream input;
     OutputStream output;
     public long lastSeen;
-    public int id;//same as requestId in server side
+    public Thread thread;
+    public int id;
     public LocalConnectionHandler(Socket client,int id){
         this.client = client;
         this.id = id;
         System.out.println("New connection from "+client.getRemoteSocketAddress());
+        Main.localServer.connectionMap.put(this.id,this);
 
     }
     @Override
@@ -46,7 +49,6 @@ public class LocalConnectionHandler implements Runnable{
             }
 
             output.write(new byte[]{5,0});
-            System.out.println("Authenticate completed.");
             input.read();//version
             int cmd = input.read();
             input.read();//SRV
@@ -74,17 +76,15 @@ public class LocalConnectionHandler implements Runnable{
 
             byte[] bytes;
             while(true){
+                //TODO read all bytes blocks util stream is closed, which is not worked as intended
                 bytes= input.readAllBytes();
 
-                if(bytes.length==1) {
+                if(bytes.length==0) {
                     System.out.println("Input stream ended.");
-                    closeConnection();
-                    return;
-                }else{
-                    System.out.println("Incoming message");
+                    break;
                 }
-                byte[] data = input.readAllBytes();
-                TcpRequest tcpRequest = new TcpRequest(data,this);
+                System.out.println("From User: "+bytes.length+" "+ ByteUtils.toHexString(bytes));
+                TcpRequest tcpRequest = new TcpRequest(bytes,this);
                 tcpRequest.send();
             }
 

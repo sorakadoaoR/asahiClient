@@ -7,9 +7,6 @@ import java.io.IOException;
 
 public class RequestInfo {
     public Request request;
-    public int encryptedDataLength;
-    public int rubbishLength;
-    public int requestId;
 
     public RequestInfo(Request request) {
         this.request = request;
@@ -18,17 +15,17 @@ public class RequestInfo {
     //returns a not encrypted header
     public byte[] buildRequestHeader(byte[] encryptedData,int rubbishLength,boolean isDataEnded) throws IOException{
         //
-        //write the 16-byte request header
-        //4:requestId 4:EncryptedDataLength 1:requestType 1:isDataCompleted 2:rubbishLength 4:localConnectionId
+        //write the 31-byte request header
+        //4:requestId 4:EncryptedDataLength 1:requestType 1:isDataCompleted 2:rubbishLength 4:connectionId 15:RSV
         //
-        MemoryStream headerStream = new MemoryStream(16);
+        MemoryStream headerStream = new MemoryStream(32);
         Utils.writeInt(headerStream,request.getRequestId());
-
         Utils.writeInt(headerStream,encryptedData.length);
         headerStream.write(request.getRequestType());
         headerStream.write(isDataEnded?1:0);
-        Utils.writeInt(headerStream,request.localConnectionHandler.id);
         Utils.write2ByteInt(headerStream,rubbishLength);
+        Utils.writeInt(headerStream,request.getConnectionId());
+        byte[] a = headerStream.toByteArray();
         return headerStream.toByteArray();
     }
 }

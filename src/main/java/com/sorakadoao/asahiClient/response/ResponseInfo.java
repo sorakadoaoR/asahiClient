@@ -18,8 +18,8 @@ public class ResponseInfo {
 
     public ResponseInfo(byte[] decryptedHeader) throws IOException, TimeoutException {
         //
-        //read the 16-byte response header
-        //4:requestId 4:EncryptedDataLength 1:requestType 1:isDataCompleted 2:rubbishLength 4:RSV
+        //read the 32-byte response header
+        //4:requestId 4:EncryptedDataLength 1:requestType 1:isDataCompleted 2:rubbishLength 4:responseId 15:RSV
         //
         ByteArrayInputStream headerStream = new ByteArrayInputStream(decryptedHeader);
         requestId = Utils.readInt(headerStream);
@@ -27,6 +27,7 @@ public class ResponseInfo {
         requestType = (byte) headerStream.read();
         isDataEnded = headerStream.read()==1;
         rubbishLength = Utils.read2byteInt(headerStream);
-        connectionHandler = Main.remoteSocket.requestConnectionHandlerMap.get(requestId);
+        int connectionId = Utils.readInt(headerStream);
+        connectionHandler = Main.localServer.connectionMap.get(connectionId);
     }
 }

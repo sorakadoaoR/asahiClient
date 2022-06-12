@@ -7,9 +7,8 @@ import java.util.HashSet;
 
 public class LocalServer implements Runnable{
     ServerSocket serverSocket;
-    public HashSet<Thread> clientSet = new HashSet<>();
     int idMost = 0;
-    HashMap<Integer,LocalConnectionHandler> connectionMap = new HashMap<>();
+    public HashMap<Integer,LocalConnectionHandler> connectionMap = new HashMap<>();
     public LocalServer(int port,int backlog)throws Exception{
         serverSocket = new ServerSocket(port,backlog);
 
@@ -22,9 +21,8 @@ public class LocalServer implements Runnable{
                 LocalConnectionHandler s = (new LocalConnectionHandler(serverSocket.accept(),idMost));
                 idMost++;
                 Thread t = new Thread(s);
-                clientSet.add(t);
+                s.thread = t;
                 t.start();
-
             } catch (IOException e) {
                 e.printStackTrace();
             }

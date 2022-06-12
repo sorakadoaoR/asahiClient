@@ -7,6 +7,9 @@ import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.zz.gmhelper.SM4Util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
@@ -19,12 +22,26 @@ public class Main {
     public static Guard guard;
 
     public static void main(String[] args) {
-        //try {
-        //    byte[] a = {1,2,3,4,5,6,7,8,9,10,11,12};
-        //    byte[] k = SM4Util.generateKey();
-        //    byte[] b = SM4Util.encrypt_ECB_Padding(k,a);
-        //    System.out.println(ByteUtils.toHexString(b)+" "+b.length);
-        //} catch (Exception e){}
+        if(false){
+            //try {
+            //    byte[] a = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,31,32};
+            //    byte[] k = SM4Util.generateKey();
+            //    byte[] b = SM4Util.encrypt_ECB_Padding(k,a);
+            //    System.out.println(ByteUtils.toHexString(b)+"    "+b.length);
+            //} catch (Exception e){}
+            //int a = 123456789;
+            //ByteArrayOutputStream b = new ByteArrayOutputStream(4);
+            //Utils.writeInt(b,a);
+            //System.out.println(ByteUtils.toHexString(b.toByteArray()));
+            //ByteArrayInputStream c = new ByteArrayInputStream(b.toByteArray());
+            //try {
+            //    System.out.println(Utils.readInt(c));
+            //} catch (IOException e) {
+            //    e.printStackTrace();
+            //}
+            return;
+        }
+
         guard = new Guard();
         Thread thread = new Thread(guard);
         thread.start();

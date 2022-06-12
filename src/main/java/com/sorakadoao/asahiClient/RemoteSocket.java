@@ -4,6 +4,8 @@ import com.sorakadoao.asahiClient.request.PendingRequest;
 import com.sorakadoao.asahiClient.request.Request;
 import com.sorakadoao.asahiClient.response.Response;
 import com.sorakadoao.asahiClient.response.ResponseInfo;
+import com.sorakadoao.asahiClient.response.TcpResponse;
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.zz.gmhelper.SM2Util;
 import org.zz.gmhelper.SM4Util;
 
@@ -24,7 +26,6 @@ public class RemoteSocket implements Runnable{
     public byte[] sm4key = new byte[16];
     Random random;
     MemoryStream memoryStream = new MemoryStream(1024);
-    public HashMap<Integer,LocalConnectionHandler> requestConnectionHandlerMap = new HashMap<>();
     public HashSet<PendingRequest> requestHashSet = new HashSet<>();
     public RemoteSocket(){
         random = new Random();
@@ -44,15 +45,13 @@ public class RemoteSocket implements Runnable{
             System.out.println("Logged in.");
             while(true){
                 //循环监听并处理服务器发来的响应
-                System.out.println(114514);
-                byte[] encryptedHeader= input.readNBytes(16);
+                byte[] encryptedHeader= input.readNBytes(32);
                 byte[] decryptedHeader = SM4Util.decrypt_ECB_Padding(sm4key,encryptedHeader);
                 ResponseInfo responseInfo = new ResponseInfo(decryptedHeader);
                 byte[] encryptedData = input.readNBytes(responseInfo.encryptedDataLength);
                 byte[] decryptedData = SM4Util.decrypt_ECB_Padding(sm4key,encryptedData);
                 Response response = Response.analyzer(responseInfo,decryptedData);
-                Request correspondingRequest = Request.getRequestByResponseInfo(responseInfo);
-                correspondingRequest.resolve(response);
+                response.resolve();
 
                 input.skipNBytes(responseInfo.rubbishLength);
             }

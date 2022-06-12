@@ -47,21 +47,4 @@ public class ConnectRequest extends Request {
         return ans;
     }
 
-    @Override
-    public void resolve(Response response) {
-        System.out.println(((ConnectResponse)response).status);
-        InetAddress a = InetAddress.getLoopbackAddress();
-        MemoryStream memoryStream = new MemoryStream(64);
-        memoryStream.write(5);
-        memoryStream.write(((ConnectResponse)response).status);
-        memoryStream.write(0);
-        memoryStream.write((a instanceof Inet4Address)?1:4);
-        try {
-            memoryStream.write(a.getAddress());
-            Utils.write2ByteInt(memoryStream, Main.juc.port);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        localConnectionHandler.sendData(memoryStream.toByteArray());
-    }
 }

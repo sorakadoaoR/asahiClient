@@ -17,9 +17,9 @@ public class Utils {
     public static void writeInt(OutputStream outputStream, int i) {
         try {
             outputStream.write(i>>24);
-            outputStream.write((i<<8)>>24);
-            outputStream.write((i<<16)>>24);
-            outputStream.write((i<<24)>>24);
+            outputStream.write((i&0xff0000)>>16);
+            outputStream.write((i&0xff00)>>8);
+            outputStream.write(i&0xff);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,14 +43,8 @@ public class Utils {
     }
 
     public static int readInt(InputStream inputStream) throws IOException{
-        int ans = 0;
-        byte[] bs = new byte[4];
-        readByteFromInput(inputStream,bs,4);
-        for(byte b:bs){
-            ans<<=8;
-            ans+=b;
-        }
-        return ans;
+        byte[] bs = inputStream.readNBytes(4);
+        return ((bs[0]&0xff)<<24)+((bs[1]&0xff)<<16)+((bs[2]&0xff)<<8)+(bs[3]&0xff);
     }
 
     public static byte[] generateRandomBytes(int count, Random random){
