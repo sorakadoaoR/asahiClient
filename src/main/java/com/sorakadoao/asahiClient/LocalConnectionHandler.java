@@ -4,6 +4,7 @@ import com.sorakadoao.asahiClient.request.ConnectRequest;
 import com.sorakadoao.asahiClient.request.TcpRequest;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +14,7 @@ public class LocalConnectionHandler implements Runnable{
     Socket client;
     InputStream input;
     OutputStream output;
+    public BufferedInputStream bufferedInput;
     public long lastSeen;
     public Thread thread;
     public int id;
@@ -28,6 +30,7 @@ public class LocalConnectionHandler implements Runnable{
         try {
             input = client.getInputStream();
             output = client.getOutputStream();
+            bufferedInput = new BufferedInputStream(input);
 
             if (input.read() != 5) {
                 closeConnection();
@@ -74,17 +77,20 @@ public class LocalConnectionHandler implements Runnable{
             ConnectRequest connectRequest = new ConnectRequest(this,(byte) addressType,address,port);
             connectRequest.send();
 
-            byte[] bytes;
+            byte[] dataBuffer = new byte[16384];
             while(true){
-                //TODO read all bytes blocks util stream is closed, which is not worked as intended
-                bytes= input.readAllBytes();
 
-                if(bytes.length==0) {
+                int byteCount = bufferedInput.read(dataBuffer);
+                if(byteCount==-1) {
                     System.out.println("Input stream ended.");
+                    closeConnection();
                     break;
                 }
-                System.out.println("From User: "+bytes.length+" "+ ByteUtils.toHexString(bytes));
-                TcpRequest tcpRequest = new TcpRequest(bytes,this);
+
+                byte[] data = new byte[byteCount];
+                System.arraycopy(dataBuffer,0,data,0,byteCount);
+                System.out.println("From User: "+data.length+" "+ ByteUtils.toHexString(data));
+                TcpRequest tcpRequest = new TcpRequest(data,this);
                 tcpRequest.send();
             }
 

@@ -31,7 +31,7 @@ public abstract class Response {
         //merge coming request with existing incomplete request
         IncompleteResponse incompleteResponse = incompleteResponseMap.get(requestInfo.requestId);
         if(!requestInfo.isDataEnded){
-            System.out.println(requestInfo.requestId +" (Partial)Down: " +  ByteUtils.toHexString(SM3Util.hash(decryptedData)));
+            System.out.println(requestInfo.connectionHandler.id +" (Partial)From server: " + decryptedData.length +" "+  ByteUtils.toHexString(SM3Util.hash(decryptedData)));
             if(incompleteResponse ==null) {
                 incompleteResponse = new IncompleteResponse(requestInfo, decryptedData);
                 incompleteResponseMap.put(requestInfo.requestId, incompleteResponse);
@@ -43,15 +43,16 @@ public abstract class Response {
             incompleteResponse.append(decryptedData);
             decryptedData = incompleteResponse.flush();
             incompleteResponseMap.remove(requestInfo.requestId);
-            System.out.println(requestInfo.requestId +" (Complete)Down: " +  ByteUtils.toHexString(SM3Util.hash(decryptedData)));
+            System.out.println(requestInfo.connectionHandler.id +" (Complete)From server: " + decryptedData.length +" "+  ByteUtils.toHexString(SM3Util.hash(decryptedData)));
         }else{
-            System.out.println(requestInfo.requestId +" (Once)Down: " +  ByteUtils.toHexString(SM3Util.hash(decryptedData)));
+            System.out.println(requestInfo.connectionHandler.id +" (Once)From server: " + decryptedData.length +" "+  ByteUtils.toHexString(SM3Util.hash(decryptedData)));
         }
 
 
         Response request = switch (requestInfo.requestType) {
             case 1 -> new ConnectResponse(requestInfo, new ByteArrayInputStream(decryptedData));
             case 2 -> new TcpResponse(requestInfo, decryptedData);
+            case 11 -> new ServerInputStreamClosedResponse(requestInfo);
             default -> null;
         };
         return request;

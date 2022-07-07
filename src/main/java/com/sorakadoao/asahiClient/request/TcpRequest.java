@@ -12,7 +12,7 @@ public class TcpRequest extends Request{
     public TcpRequest(byte[] data,LocalConnectionHandler localConnectionHandler) {
         super(localConnectionHandler);
         this.data = data;
-        System.out.println(localConnectionHandler.id +" Up: " +  ByteUtils.toHexString(SM3Util.hash(data)));
+        System.out.println(localConnectionHandler.id +" Send to server: " +  ByteUtils.toHexString(SM3Util.hash(data)));
     }
 
     @Override

@@ -11,7 +11,7 @@ public class TcpResponse extends Response{
     }
     @Override
     public void resolve() {
-        System.out.println(responseInfo.requestId +" Down: " + ByteUtils.toHexString( SM3Util.hash(data)));
+        System.out.println(responseInfo.connectionHandler.id +" From server: " + ByteUtils.toHexString( SM3Util.hash(data)));
         localConnectionHandler.sendData(data);
     }
 }
